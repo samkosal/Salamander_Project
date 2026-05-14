@@ -7,10 +7,11 @@ export default function Videos() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getVideos().then((data) => 
-      setVideos(data),
-      setLoading(false),
-  );
+    getVideos()
+      .then((data) => {
+        setVideos(data);
+        setLoading(false);
+      });
   }, []);
 
   if (loading) {
