@@ -22,7 +22,7 @@ const thumbnails = {
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function getVideos() {
-  await delay(2000);
+  await delay(400);
   return videos;
 }
 
