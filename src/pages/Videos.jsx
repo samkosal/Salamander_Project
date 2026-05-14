@@ -4,9 +4,18 @@ import { getVideos } from '../mockApi.js';
 export default function Videos() {
   const [videos, setVideos] = useState([]);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    getVideos().then((data) => setVideos(data));
+    getVideos().then((data) => 
+      setVideos(data),
+      setLoading(false),
+  );
   }, []);
+
+  if (loading) {
+    return <p>Loading videos...</p>;
+  }
 
   return (
     <div>
