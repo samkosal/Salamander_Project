@@ -2,6 +2,8 @@ import { Routes, Route , Link} from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import Videos from './pages/Videos.jsx';
 import Preview from './pages/Preview.jsx';
+import './index.css'
+
 
 export default function App() {
   return (
