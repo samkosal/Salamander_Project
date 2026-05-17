@@ -7,7 +7,7 @@ import './index.css'
 
 export default function App() {
   return (
-    <div>
+    <div className="bg-green-600 text-black grid place-items-center">
       <nav>
         <Link to="/">Home</Link>
         {' | '}
