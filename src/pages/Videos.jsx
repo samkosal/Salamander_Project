@@ -22,11 +22,11 @@ export default function Videos() {
   }, []);
 
   if (error) {
-    return <p className="font-mono text-red-600">Could not load videos: {error}</p>;
+    return <div className="min-h-screen bg-black px-50 grid place-items-center"><p className="font-mono text-red-600">Could not load videos: {error}</p></div>;
   }
 
   if (loading) {
-    return <p className="font-mono text-green-600">Loading videos...</p>;
+    return <div className="min-h-screen bg-black px-50 grid place-items-center"><p className="bg-black font-mono text-green-600">Loading videos...</p></div>;
   }
 
   return (
