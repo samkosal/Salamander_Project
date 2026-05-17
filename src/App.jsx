@@ -7,11 +7,11 @@ import './index.css'
 
 export default function App() {
   return (
-    <div className="bg-green-600 text-black grid place-items-center">
+    <div className="bg-green-600 text-black grid place-items-center font-Arial">
       <nav>
-        <Link to="/">Home</Link>
+        <Link to="/" className="hover:text-red-600">Home</Link>
         {' | '}
-        <Link to="/videos">Videos</Link>
+        <Link to="/videos" className="hover:text-red-600">Videos</Link>
       </nav>
       <Routes>
         <Route path="/" element={<Home />} />
