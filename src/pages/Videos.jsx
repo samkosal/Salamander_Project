@@ -21,6 +21,7 @@ export default function Videos() {
       });
   }, []);
 
+
   if (error) {
     return <div className="min-h-screen bg-black px-50 grid place-items-center"><p className="font-mono text-red-600">Could not load videos: {error}</p></div>;
   }
