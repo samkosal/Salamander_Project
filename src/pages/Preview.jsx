@@ -51,11 +51,7 @@ export default function Preview() {
         const g = px[i + 1];
         const b = px[i + 2];
 
-        const distance = Math.sqrt(
-            (r - targetR) * (r - targetR) +
-            (g - targetG) * (g - targetG) +
-            (b - targetB) * (b - targetB)
-        );
+        const distance = Math.sqrt((r - targetR) * (r - targetR) + (g - targetG) * (g - targetG) + (b - targetB) * (b - targetB));
 
         const value = distance <= tolerance ? 255 : 0;
 
