@@ -1,6 +1,6 @@
 import { useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
-import { getVideos } from '../mockApi.js';
+import { getVideos } from '../api.js';
 
 export default function Videos() {
   const [videos, setVideos] = useState([]);
