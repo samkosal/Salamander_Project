@@ -77,6 +77,7 @@ export default function Preview() {
         <input type="color" onChange={(e) => setColor(e.target.value)} value={color} />
         <input type="range" onChange={(e) => setTolerance(e.target.value)} value={tolerance} />
         <canvas className="bg-white border-2" ref={canvasRef} />
+        <button className="text-orange-600 hover:text-green-600">Submit Job</button>
         <Link to="/videos" className="hover:text-red-600">Back to videos</Link>
         </div>
     );
