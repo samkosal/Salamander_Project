@@ -71,13 +71,11 @@ export default function Preview() {
     }
 
     const { x, y } = Salamander.centroid;
-    const index = (y * canvas.width + x) * 4;
-    data.data[index] = 255;
-    data.data[index + 1] = 0;
-    data.data[index + 2] = 0;
-    data.data[index + 3] = 255;
-
     ctx.putImageData(data, 0, 0);
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.fill();
     }, [imageReady, color, tolerance]);
 
     function buildBinaryImage(px, width, height) {
