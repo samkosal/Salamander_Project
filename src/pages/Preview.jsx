@@ -15,7 +15,7 @@ export default function Preview() {
     const [error, setError] = useState(null);
     const [imageReady, setImageReady] = useState(false);
     const [color, setColor] = useState('#ffffff');
-    const [tolerance, setTolerance] = useState(0);
+    const [tolerance, settolerance] = useState(0);
 
     useEffect(() => {
         getThumbnail(filename)
@@ -59,8 +59,94 @@ export default function Preview() {
         px[i + 1] = value;
         px[i + 2] = value;
     }
+
+    //Building Binary Image seperately because px format would severly hamper attempts to just plug in the canvas we just built
+    const binaryImage = buildBinaryImage(px, canvas.width, canvas.height);
+    const groups = findConnectedGroups(binaryImage);
+    const Salamander = groups[0];
+
+    if (groups.length === 0) {
+        ctx.putImageData(data, 0, 0);
+        return;
+    }
+
+    const { x, y } = Salamander.centroid;
+    const index = (y * canvas.width + x) * 4;
+    data.data[index] = 255;
+    data.data[index + 1] = 0;
+    data.data[index + 2] = 0;
+    data.data[index + 3] = 255;
+
     ctx.putImageData(data, 0, 0);
     }, [imageReady, color, tolerance]);
+
+    function buildBinaryImage(px, width, height) {
+        const image = [];
+
+        for (let y = 0; y < height; y++) {
+            const row = [];
+
+            for (let x = 0; x < width; x++) {
+                const index = (y * width + x) * 4;
+                row.push(px[index] === 255 ? 1 : 0);
+            }
+
+            image.push(row);
+        }
+
+        return image;
+    }
+
+    function findConnectedGroups(image) {
+        const groups = [];
+
+        for (let r = 0; r < image.length; r++) {
+            for (let c = 0; c < image[0].length; c++) {
+                if (image[r][c] === 1) {
+                    groups.push(dfs(image, r, c));
+                }
+            }
+        }
+
+        groups.sort((a, b) => b.size - a.size);
+
+        return groups;
+    }
+
+    function dfs(image, startRow, startCol) {
+        const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+        const stack = [[startRow, startCol]];
+        image[startRow][startCol] = 0;
+
+        let size = 0;
+        let sumX = 0;
+        let sumY = 0;
+        while (stack.length > 0) {
+            const [r, c] = stack.pop();
+
+            size++;
+            sumX += c;
+            sumY += r;
+
+            for (const [dr, dc] of directions) {
+                const newr = r + dr;
+                const newc = c + dc;
+
+                if (newr >= 0 && newr < image.length && newc >= 0 && newc < image[0].length && image[newr][newc] === 1) {
+                    image[newr][newc] = 0;
+                    stack.push([newr, newc]);
+                }
+            }
+        }
+
+        return {
+            size,
+            centroid: {
+                x: Math.floor(sumX / size),
+                y: Math.floor(sumY / size)
+            }
+        };
+    }
 
     if (error) {
         return <div className="min-h-screen bg-black px-50 grid place-items-center"><p className="font-mono text-red-600">Could not load thumbnail: {error}</p></div>;
@@ -75,9 +161,10 @@ export default function Preview() {
         <h1>Preview: {filename}</h1>
         <img ref={imgRef} src={thumbnail} alt={filename} onLoad={() => setImageReady(true)}/>
         <input type="color" onChange={(e) => setColor(e.target.value)} value={color} />
-        <input type="range" onChange={(e) => setTolerance(e.target.value)} value={tolerance} />
+        <input type="range" onChange={(e) => settolerance(e.target.value)} value={tolerance} />
         <canvas className="bg-white border-2" ref={canvasRef} />
         <button className="text-orange-600 hover:text-green-600 rounded-xl border-2 border-orange-600 hover:border-green-600">Submit Job</button>
+
         <Link to="/videos" className="hover:text-red-600">Back to videos</Link>
         </div>
     );
