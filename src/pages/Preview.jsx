@@ -178,7 +178,7 @@ export default function Preview() {
         <h1>Preview: {filename}</h1>
         <img ref={imgRef} src={thumbnail} alt={filename} onLoad={() => setImageReady(true)}/>
         <input type="color" onChange={(e) => setColor(e.target.value)} value={color} />
-        <input type="range" onChange={(e) => settolerance(e.target.value)} value={tolerance} />
+        <input type="range" onChange={(e) => setTolerance(e.target.value)} value={tolerance} />
         <canvas className="bg-white border-2" ref={canvasRef} />
         <button onClick={handleSubmitJob} className="text-orange-600 hover:text-green-600 rounded-xl border-2 border-orange-600 hover:border-green-600">Submit Job</button>
         <Link to="/videos" className="hover:text-red-600">Back to videos</Link>
