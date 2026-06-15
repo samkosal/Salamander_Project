@@ -1,72 +1,29 @@
 import { Link, useParams } from 'react-router-dom';
-import { getThumbnail, getJobStatus, submitProcessingJob } from '../api.js';
-import { useRef, useState, useEffect } from 'react';
+import { getJobStatus, submitProcessingJob } from '../api.js'; // getThumbnail no longer used (thumbnail fetch commented out below)
+import { useState, useEffect } from 'react';
+import { useBwVideo } from '../hooks/useBwVideo.js';
 
 export default function Preview() {
     const { filename } = useParams();
 
-    //ref
-    const canvasRef = useRef(null);
-    const imgRef = useRef(null);
-
     //state
-    const [thumbnail, setThumbnail] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [imageReady, setImageReady] = useState(false);
     const [color, setColor] = useState('#ffffff');
     const [tolerance, setTolerance] = useState(0);
     const [jobId, setJobId] = useState(null);
+
+    // live B&W view: attach these refs to the <video> and <canvas> below
+    const { videoRef, canvasRef } = useBwVideo(color, tolerance);
+
+    // --- old thumbnail flow state (commented out, kept for reference) ---
+    // const [thumbnail, setThumbnail] = useState([]);
+    // const [loading, setLoading] = useState(true);
+    // const [error, setError] = useState(null);
+    // const [imageReady, setImageReady] = useState(false);
 
     const handleSubmitJob = async () => {
         const result = await submitProcessingJob(filename, color, tolerance);
         setJobId(result.jobId);
     };
-
-    useEffect(() => {
-        getThumbnail(filename)
-        .then((data) => {
-            setThumbnail(data);
-            setLoading(false)
-        })
-        .catch((err) => {
-            setError(err.message);
-            setLoading(false);
-        })
-    },[]);
-
-    useEffect(() => {
-        if (!imageReady) return;
-        const img = imgRef.current;
-        const canvas = canvasRef.current;
-        if (!img || !canvas) return;
-
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const px = data.data;
-
-        const targetR = parseInt(color.slice(1, 3), 16);
-        const targetG = parseInt(color.slice(3, 5), 16);
-        const targetB = parseInt(color.slice(5, 7), 16);
-
-        for (let i = 0; i < px.length; i += 4) {
-            const r = px[i];
-            const g = px[i + 1];
-            const b = px[i + 2];
-
-            const distance = Math.sqrt((r - targetR) * (r - targetR) + (g - targetG) * (g - targetG) + (b - targetB) * (b - targetB));
-
-            const value = distance <= tolerance ? 255 : 0;
-
-            px[i] = value;
-            px[i + 1] = value;
-            px[i + 2] = value;
-        }
-        ctx.putImageData(data, 0, 0);
-    }, [imageReady, color, tolerance]);
 
     useEffect(() => {
         if (!jobId) return;
@@ -81,22 +38,35 @@ export default function Preview() {
         return () => clearInterval(id);
     }, [jobId]);
 
-    if (error) {
-        return <div className="min-h-screen bg-black px-50 grid place-items-center"><p className="font-mono text-red-600">Could not load thumbnail: {error}</p></div>;
-    }
-
-    if (loading) {
-        return <div className="min-h-screen bg-black px-50 grid place-items-center"><p className="bg-black font-mono text-green-600">Loading thumbnail...</p></div>;
-    }
-
     return (
         <div className="min-h-screen bg-black text-green-600 grid place-items-center px-50 font-mono">
         <h1>Preview: {filename}</h1>
-        <img ref={imgRef} src={thumbnail} alt={filename} onLoad={() => setImageReady(true)}/>
-        <input type="color" onChange={(e) => setColor(e.target.value)} value={color} />
-        <input type="range" onChange={(e) => setTolerance(e.target.value)} value={tolerance} />
-        <canvas className="bg-white border-2" ref={canvasRef} />
-        <button onClick={handleSubmitJob} className="text-orange-600 hover:text-green-600 rounded-xl border-2 border-orange-600 hover:border-green-600">Submit Job</button>
+
+        {/* color + B&W side by side, both driven by the one <video> so they stay in sync */}
+        <div className="flex gap-4 items-start">
+            <div className="flex flex-col items-center gap-1">
+                <span>Color</span>
+                <video
+                    ref={videoRef}
+                    src={`/videos/${filename}`}
+                    controls
+                    muted
+                    className="max-w-md"
+                />
+            </div>
+            <div className="flex flex-col items-center gap-1">
+                <span>Black &amp; White</span>
+                <canvas ref={canvasRef} className="max-w-md bg-black border-2" />
+            </div>
+        </div>
+
+        <label>Target color <input type="color" onChange={(e) => setColor(e.target.value)} value={color} /></label>
+        <label>Tolerance: {tolerance}
+            <input type="range" min={1} max={60} onChange={(e) => setTolerance(e.target.value)} value={tolerance} />
+        </label>
+
+        <button className="text-orange-600 hover:text-green-600" onClick={handleSubmitJob}>Submit Job</button>
+
         <Link to="/videos" className="hover:text-red-600">Back to videos</Link>
         </div>
     );
