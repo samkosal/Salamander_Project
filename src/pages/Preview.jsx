@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
-import { getJobStatus, submitProcessingJob } from '../api.js'; // getThumbnail no longer used (thumbnail fetch commented out below)
+import { getJobStatus, submitProcessingJob } from '../api.js';
 import { useState, useEffect } from 'react';
 import { useBwVideo } from '../hooks/useBwVideo.js';
 
@@ -11,14 +11,8 @@ export default function Preview() {
     const [tolerance, setTolerance] = useState(0);
     const [jobId, setJobId] = useState(null);
 
-    // live B&W view: attach these refs to the <video> and <canvas> below
-    const { videoRef, canvasRef } = useBwVideo(color, tolerance);
-
-    // --- old thumbnail flow state (commented out, kept for reference) ---
-    // const [thumbnail, setThumbnail] = useState([]);
-    // const [loading, setLoading] = useState(true);
-    // const [error, setError] = useState(null);
-    // const [imageReady, setImageReady] = useState(false);
+    // live B&W view + centroid overlay: attach these refs to the elements below
+    const { videoRef, canvasRef, overlayRef } = useBwVideo(color, tolerance);
 
     const handleSubmitJob = async () => {
         const result = await submitProcessingJob(filename, color, tolerance);
@@ -29,8 +23,8 @@ export default function Preview() {
         if (!jobId) return;
 
         const id = setInterval(async () => {
-            const status = await getJobStatus(jobId);
-            // update progress state from the response
+            await getJobStatus(jobId);
+            // TODO: read progress from the response and update state;
             // if the job is complete or failed, stop polling: clearInterval(id)
         }, 1500);
 
@@ -56,7 +50,11 @@ export default function Preview() {
             </div>
             <div className="flex flex-col items-center gap-1">
                 <span>Black &amp; White</span>
-                <canvas ref={canvasRef} className="max-w-md bg-black border-2" />
+                {/* the overlay canvas sits on top of the B&W canvas to draw the centroid dot */}
+                <div className="relative max-w-md">
+                    <canvas ref={canvasRef} className="block w-full bg-black border-2" />
+                    <canvas ref={overlayRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+                </div>
             </div>
         </div>
 
