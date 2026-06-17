@@ -30,8 +30,8 @@ export default function Log() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-black text-white p-8">
-            <h1 className="text-3xl font-bold mb-6">Job Logs</h1>
+        <div className="min-h-screen bg-black text-white grid place-items-center">
+            <h1 className="text-3xl font-bold text-green-600">Job Logs</h1>
 
             {error && (
                 <p className="text-red-500">{error}</p>
@@ -44,7 +44,7 @@ export default function Log() {
                     {logs.map((log) => (
                         <div
                             key={log.jobId}
-                            className="border border-gray-700 rounded p-4"
+                            className="border border-gray-700 rounded p-4 text-green-600"
                         >
                             <p><strong>Job ID:</strong> {log.jobId}</p>
                             <p><strong>File:</strong> {log.filename}</p>
