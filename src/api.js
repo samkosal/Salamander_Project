@@ -35,3 +35,9 @@ export async function getJobStatus(jobId) {
   }
   return res.json();
 }
+
+export async function getLog() {
+    const response = await fetch("/job-logs");
+    if (!response.ok) throw new Error("Error fetching logs");
+    return response.json();
+}
