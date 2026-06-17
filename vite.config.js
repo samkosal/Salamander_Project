@@ -11,6 +11,7 @@ export default defineConfig({
       '/process': 'http://localhost:3000',
       '/results': 'http://localhost:3000',
       '/job-logs': 'http://localhost:3000',
+      '/videos': 'http://localhost:3000',
     },
   },
 })
