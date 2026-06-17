@@ -29,7 +29,7 @@ export async function submitProcessingJob(filename, targetColor, threshold) {
 }
 
 export async function getJobStatus(jobId) {
-  const res = await fetch(`/process/${jobId}/status`);
+  const res = await fetch(`/job/${jobId}`);
   if (!res.ok) {
     throw new Error(`Server responded ${res.status}`);
   }
