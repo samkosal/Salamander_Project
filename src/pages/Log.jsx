@@ -30,7 +30,7 @@ export default function Log() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-black text-white grid place-items-center">
+        <div className="min-h-screen bg-black text-white grid place-items-center px-30">
             <h1 className="text-3xl font-bold text-green-600">Job Logs</h1>
 
             {error && (
